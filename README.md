@@ -1,4 +1,4 @@
-# 🌐 SNMP MIB 监控平台 (SQLite版本)
+# 🌐 SNMP MIB 监控平台 (SQLite 版本)
 
 <div align="center">
 
@@ -13,381 +13,127 @@
 
 </div>
 
-> 🚀 **企业级SNMP网络设备监控管理平台** - 轻量级网络设备监控和管理解决方案，采用SQLite数据库和内存缓存，支持零配置快速部署，无需Docker和外部数据库依赖。
+> 🚀 **企业级SNMP网络监控平台。** 一个轻量级的独立解决方案，采用Go后端和Next.js前端。它无需Docker、PostgreSQL或Redis等任何外部依赖，部署极其简单。
 
-## ✨ 特性
+## ✨ 主要特性
 
-- 🗃️ **SQLite数据库** - 无需外部数据库，文件存储
-- 💾 **内存缓存** - 高性能缓存系统，无需Redis
-- 🚀 **零配置部署** - 一键启动，无需Docker
-- 📱 **响应式设计** - 支持桌面和移动设备
-- 🌐 **多语言支持** - 中文/英文界面
-- 🔒 **安全认证** - JWT认证和权限管理
-- 📊 **实时监控** - SNMP设备监控和告警
-- 🔧 **配置管理** - 设备模板和批量配置
+- 🚀 **零依赖部署**: 无需Docker，无需外部数据库。作为独立的二进制文件运行。
+- 🗃️ **SQLite驱动**: 简单的基于文件的数据库，易于管理和备份。
+- 💾 **内存缓存**: 无需Redis即可为关键操作提供高性能缓存。
+- 🔧 **强大的工具集**: 包括设备发现、MIB管理、配置生成和批量操作。
+- 📊 **监控集成**: 为Prometheus、Categraf和其他监控系统生成配置。
+- 📱 **现代化UI**: 使用Next.js和shadcn/ui构建的响应式、直观的Web界面。
+- 🌐 **多语言支持**: 支持中英文切换。
 
-## 🎯 系统要求
+## 🛠️ 技术栈
 
-- **操作系统**: Linux/macOS/Windows
-- **Node.js**: 18+ 
-- **Go**: 1.21+
-- **内存**: 最低512MB，推荐1GB+
-- **磁盘**: 最低1GB可用空间
+- **前端**: Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
+- **后端**: Go 1.23, Gin, GORM
+- **数据库**: SQLite 3 及内存缓存 (LRU)
+- **部署**: 独立二进制文件，可选`systemd`服务集成。
 
-## 🚀 快速开始
+## 🏗️ 系统架构
 
-### 📋 系统要求
+平台作为两个主要进程运行：一个用Go编写的后端API服务器和一个由Next.js驱动的前端服务器。
 
-- **操作系统**: Linux/macOS/Windows
-- **Node.js**: 18+ 
-- **Go**: 1.21+
-- **内存**: 最低512MB，推荐1GB+
-- **磁盘**: 最低1GB可用空间
+```mermaid
+graph TD
+    subgraph "用户设备"
+        A[Web浏览器]
+    end
 
-### 1. 克隆项目
+    subgraph "服务器"
+        B[Next.js 前端 :12300]
+        C[Go 后端 API :17880]
+        D[SQLite 数据库 (snmp_platform.db)]
+        E[内存缓存]
+    end
 
-```bash
-git clone https://github.com/evan7434/snmp-mib-ui.git
-cd snmp-mib-ui
+    subgraph "网络设备"
+        F[交换机, 路由器等]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    C -- SNMP --> F
 ```
 
-### 2. 一键部署
+## 🚀 快速入门
 
-```bash
-# 方式一：简化部署（推荐）
-./deploy-simple.sh
+### 📋 环境要求
 
-# 方式二：无Docker部署
-./deploy-local-no-docker.sh
+- **操作系统**: Linux / macOS / Windows
+- **Node.js**: `v18.0` 或更高版本
+- **Go**: `v1.21` 或更高版本
 
-# 方式三：systemd服务部署
-sudo ./install-systemd-services.sh
-```
+### ⚡ 安装与部署
 
-### 3. 服务管理
+1.  **克隆代码库:**
+    ```bash
+    git clone https://github.com/evan7434/snmp-mib-ui.git
+    cd snmp-mib-ui
+    ```
 
-```bash
-# 启动服务
-./start-services.sh
+2.  **运行简化部署脚本:**
+    该脚本将为您安装依赖、构建前端和后端，并创建启动/停止脚本。
+    ```bash
+    ./deploy-simple.sh
+    ```
 
-# 停止服务
-./stop-services.sh
+3.  **启动服务:**
+    ```bash
+    ./start.sh
+    ```
 
-# 查看服务状态
-systemctl status snmp-mib-platform.target
-```
+现在，应用程序已成功运行！
 
-### 4. 访问应用
+### 📱 访问地址
 
 | 服务 | URL | 描述 |
-|------|-----|------|
-| 🌐 **Web界面** | http://localhost:12300 | 主要管理界面 |
-| 🔌 **API接口** | http://localhost:17880/api/v1 | RESTful API |
-| 🏥 **健康检查** | http://localhost:12300/api/health | 系统状态检查 |
+|---|---|---|
+| 🌐 **Web界面** | `http://localhost:12300` | 主要的管理用户界面 |
+| 🔌 **API服务** | `http://localhost:17880` | 后端API |
 
-## 📖 功能模块
+### 🔧 服务管理
 
-### 🎛️ 核心功能模块
+使用生成的脚本来管理平台：
 
-#### 📊 设备管理 (`/devices`)
-- **设备发现**: 自动扫描发现网络中的SNMP设备，支持IP范围扫描
-- **设备注册**: 手动添加设备和批量导入，支持Excel/CSV格式
-- **状态监控**: 实时显示设备在线状态和关键指标
-- **分组管理**: 按网段、类型、厂商或用途对设备进行分组
-- **厂商支持**: 专门优化支持Cisco、华为、H3C、Juniper等主流设备
+-   **启动服务**: `./start.sh`
+-   **停止服务**: `./stop.sh`
+-   **检查状态**: `./status.sh`
+-   **查看日志**: `tail -f logs/frontend.log` 或 `tail -f logs/backend.log`
 
-#### 📁 MIB管理 (`/mibs`)
-- **文件上传**: 支持拖拽上传MIB文件，自动解析MIB树结构
-- **解析验证**: 自动解析MIB文件并验证语法正确性
-- **OID浏览器**: 树状结构显示OID层级关系，支持搜索和过滤
-- **多厂商MIB**: 内置Cisco、华为、H3C等厂商的标准MIB库
+关于更高级的部署选项，例如作为`systemd`服务运行，请参阅[部署指南](docs/DEPLOYMENT.md)。
 
-#### ⚙️ 配置生成 (`/config-gen`)
-- **SNMP Exporter配置**: 自动生成不同厂商的监控配置
-- **Categraf配置**: 生成夜莺监控采集器配置文件
-- **Prometheus配置**: 生成Prometheus抓取任务配置
-- **告警规则**: 根据设备类型生成对应的告警规则模板
-- **配置验证**: 内置配置语法检查和最佳实践建议
+## 📖 功能概览
 
-#### 🚨 告警管理 (`/alert-rules`)
-- **规则编辑器**: 可视化PromQL规则编写，支持语法高亮
-- **多系统部署**: 支持Prometheus、VMAlert、Alertmanager的告警规则部署
-- **通知配置**: 支持邮件、钉钉、企业微信、Slack等通知方式
-- **告警模板**: 提供网络设备常用告警规则模板库
-- **批量操作**: 支持批量启用/禁用告警规则
+该平台为网络管理提供了一整套全面的工具：
 
-#### 🔧 监控安装器 (`/monitoring-installer`)
-- **组件管理**: 管理Node Exporter、SNMP Exporter、Categraf等监控组件
-- **远程部署**: 通过SSH自动部署监控组件到远程主机
-- **配置同步**: 自动同步监控配置到目标主机
-- **服务状态**: 实时监控已部署组件的运行状态
-- **版本管理**: 支持监控组件版本升级和回滚
+-   **设备管理**: 发现、注册和监控启用SNMP的设备。按类型、供应商或位置对它们进行分组。
+-   **MIB管理**: 通过用户友好的OID树状图上传、解析和浏览MIB文件。
+-   **配置生成**: 自动为`SNMP Exporter`、`Categraf`和`Prometheus`创建配置。
+-   **告警规则管理**: 一个强大的编辑器，用于为`Prometheus`和`VictoriaMetrics`创建和部署告警规则。
+-   **监控安装器**: 通过SSH在其他主机上远程安装和管理监控代理。
+-   **批量操作**: 一次性在多台设备上执行测试连接或更新配置等操作。
 
-#### 🛠️ 批量操作 (`/tools/bulk-ops`)
-- **批量配置**: 批量修改设备SNMP配置信息
-- **批量部署**: 批量部署监控配置到多个设备
-- **批量测试**: 批量测试设备连通性和SNMP可用性
-- **操作日志**: 完整的批量操作日志和结果跟踪
+## 📚 文档
 
-#### 📈 实时监控 (`/monitoring`)
-- **指标查询**: 实时查询设备监控指标数据
-- **图表展示**: 动态图表展示设备性能趋势
-- **阈值告警**: 自定义指标阈值和告警条件
-- **数据导出**: 支持监控数据CSV/JSON格式导出
+- **[部署指南](docs/DEPLOYMENT.md)**: 生产环境设置的详细说明，包括`systemd`和反向代理。
+- **[API参考](docs/API.md)**: 后端RESTful API的文档。
+- **[开发指南](docs/DEVELOPMENT.md)**: 如何设置开发环境。
+- **[故障排除指南](docs/troubleshooting.md)**: 常见问题的解决方案。
 
-## 📁 项目结构
+## 🤝 贡献
 
-```
-snmp-mib-ui/
-├── app/                    # Next.js 应用目录
-│   ├── api/               # API路由
-│   ├── devices/           # 设备管理页面
-│   ├── mibs/              # MIB管理页面
-│   ├── config-gen/        # 配置生成页面
-│   ├── alert-rules/       # 告警规则页面
-│   ├── monitoring-installer/ # 监控安装器页面
-│   ├── tools/             # 工具页面
-│   └── monitoring/        # 实时监控页面
-├── backend/               # Go 后端服务
-│   ├── controllers/       # 控制器
-│   ├── models/           # 数据模型
-│   ├── services/         # 业务逻辑
-│   └── utils/            # 工具函数
-├── components/            # 共享组件
-├── lib/                  # 工具库
-├── systemd/              # systemd服务配置
-├── data/                 # SQLite 数据库文件
-├── logs/                 # 应用日志
-├── deploy-simple.sh      # 简化部署脚本
-├── start-services.sh     # 启动脚本
-├── stop-services.sh      # 停止脚本
-└── install-systemd-services.sh # systemd安装脚本
-```
-
-## 🔧 服务管理
-
-### 脚本方式管理
-
-```bash
-# 启动所有服务
-./start-services.sh
-
-# 停止所有服务
-./stop-services.sh
-
-# 查看前端日志
-tail -f frontend.log
-
-# 查看后端日志
-tail -f backend.log
-
-# 重启服务
-./stop-services.sh && ./start-services.sh
-```
-
-### systemd服务管理
-
-```bash
-# 安装systemd服务
-sudo ./install-systemd-services.sh
-
-# 启动平台服务
-sudo systemctl start snmp-mib-platform.target
-
-# 停止平台服务
-sudo systemctl stop snmp-mib-platform.target
-
-# 查看服务状态
-sudo systemctl status snmp-mib-platform.target
-
-# 查看各组件状态
-sudo systemctl status snmp-mib-backend.service
-sudo systemctl status snmp-mib-frontend.service
-
-# 开机自启
-sudo systemctl enable snmp-mib-platform.target
-
-# 查看服务日志
-sudo journalctl -u snmp-mib-backend.service -f
-sudo journalctl -u snmp-mib-frontend.service -f
-```
-
-## 📊 性能优化
-
-### 数据库优化
-- SQLite WAL模式，提高并发性能
-- 自动索引优化
-- 定期数据清理
-
-### 缓存策略
-- 内存LRU缓存
-- 智能过期策略
-- 缓存预热机制
-
-### 前端优化
-- 代码分割和懒加载
-- 静态资源压缩
-- Service Worker缓存
-
-## 🐛 故障排除
-
-### 常见问题
-
-1. **服务启动失败**
-   ```bash
-   # 检查端口占用
-   netstat -tulpn | grep :12300
-   netstat -tulpn | grep :17880
-   
-   # 检查日志
-   tail -f logs/frontend.log
-   tail -f logs/backend.log
-   ```
-
-2. **数据库连接错误**
-   ```bash
-   # 检查数据库文件权限
-   ls -la data/snmp_platform.db
-   
-   # 重新初始化数据库
-   rm -f data/snmp_platform.db
-   ./start.sh
-   ```
-
-3. **内存不足**
-   ```bash
-   # 检查内存使用
-   free -h
-   
-   # 清理缓存
-   curl -X POST http://localhost:17880/api/cache/clear
-   ```
-
-### 日志级别
-
-- **DEBUG**: 详细调试信息
-- **INFO**: 一般运行信息
-- **WARN**: 警告信息
-- **ERROR**: 错误信息
-
-## 🔒 安全配置
-
-### 生产环境建议
-
-1. **修改默认端口**
-   ```bash
-   export FRONTEND_PORT=8080
-   export SERVER_PORT=8081
-   ```
-
-2. **启用HTTPS**
-   - 配置反向代理 (Nginx/Apache)
-   - 使用SSL证书
-
-3. **防火墙配置**
-   ```bash
-   # 只允许必要端口
-   ufw allow 12300
-   ufw allow 17880
-   ```
-
-4. **数据备份**
-   ```bash
-   # 定期备份数据库
-   cp data/snmp_platform.db backup/snmp_platform_$(date +%Y%m%d).db
-   ```
-
-## 📈 监控和维护
-
-### 系统监控
-
-```bash
-# 检查系统资源
-curl http://localhost:17880/api/system/health
-
-# 查看缓存统计
-curl http://localhost:17880/api/cache/stats
-
-# 数据库统计
-curl http://localhost:17880/api/database/stats
-```
-
-### 定期维护
-
-1. **清理日志文件**
-   ```bash
-   # 清理7天前的日志
-   find logs/ -name "*.log" -mtime +7 -delete
-   ```
-
-2. **数据库优化**
-   ```bash
-   # SQLite优化
-   sqlite3 data/snmp_platform.db "VACUUM;"
-   sqlite3 data/snmp_platform.db "ANALYZE;"
-   ```
-
-3. **更新检查**
-   ```bash
-   git pull origin main
-   ./deploy-simple.sh
-   ```
-
-## 🎨 自定义配置
-
-### 环境变量
-
-```bash
-# 数据库配置
-export SQLITE_DB_PATH=./data/snmp_platform.db
-
-# 服务端口
-export FRONTEND_PORT=12300
-export SERVER_PORT=17880
-
-# 缓存配置
-export CACHE_MAX_MEMORY=256  # MB
-export CACHE_TTL=3600        # 秒
-
-# 日志配置
-export LOG_LEVEL=INFO
-export LOG_FILE=./logs/app.log
-```
-
-### 主题自定义
-
-编辑 `app/globals.css` 文件来自定义主题颜色和样式。
-
-## 🤝 贡献指南
-
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
-
-## 📝 更新日志
-
-### v2.0.0 (2024-12-25)
-- ✅ 移除PostgreSQL依赖，改用SQLite
-- ✅ 移除Redis依赖，改用内存缓存
-- ✅ 简化部署流程，支持一键启动
-- ✅ 优化性能和资源使用
-- ✅ 完善错误处理和日志记录
-
-### v1.x.x
-- 基于PostgreSQL + Redis的版本
+我们欢迎各种贡献！有关如何提交拉取请求、报告错误和建议功能的详细信息，请参阅[CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 📞 支持
-
-- 🐛 **Bug报告**: [GitHub Issues](https://github.com/evan7434/snmp-mib-ui/issues)
-- 💡 **功能请求**: [GitHub Discussions](https://github.com/evan7434/snmp-mib-ui/discussions)
-- 📧 **邮件支持**: evan@example.com
+本项目根据[MIT许可证](LICENSE)开源。
 
 ---
-
-⭐ 如果这个项目对你有帮助，请给它一个星标！
+<div align="center">
+⭐ 如果这个项目对您有帮助，请给它一个星标！ ⭐
+</div>
